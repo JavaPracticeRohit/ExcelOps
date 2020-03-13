@@ -1,7 +1,7 @@
 /**
  * Code created by Rohit Bhatia for self use or Demo purpose only.
  */
-package demo.service;
+package service;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -13,9 +13,9 @@ import java.util.stream.Collectors;
 
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 
-import demo.data.RowData;
-import demo.xlsUtils.XlsReaderUtils;
-import demo.xlsUtils.XlsWriterUtils;
+import data.RowData;
+import xlsUtils.XlsReaderUtils;
+import xlsUtils.XlsWriterUtils;
 
 /**
  * @author blchi

@@ -1,7 +1,7 @@
 /**
  * Code created by Rohit Bhatia for self use or Demo purpose only.
  */
-package demo.xlsUtils;
+package xlsUtils;
 
 import java.io.IOException;
 import java.util.Iterator;
@@ -13,7 +13,7 @@ import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.CellType;
 
-import demo.data.RowData;
+import data.RowData;
 
 /**
  * @author blchi

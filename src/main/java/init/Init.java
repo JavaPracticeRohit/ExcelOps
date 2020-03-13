@@ -1,4 +1,4 @@
-package demo.init;
+package init;
 
 import java.awt.Desktop;
 import java.io.File;
@@ -15,8 +15,8 @@ import java.util.logging.Logger;
 
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 
-import demo.data.RowData;
-import demo.service.XlsService;
+import data.RowData;
+import service.XlsService;
 
 public class Init {
 	private static final Logger LOGGER = Logger.getLogger(Init.class.getName());
@@ -113,7 +113,7 @@ public class Init {
 								break;
 							default:
 								sendToConsole("Implementation missing for " + fileType
-										+ ". Kindly connect with techinical Team.");
+										+ ". Kindly connect with technical Team.");
 							}
 						} else {
 							sendToConsole("Invalid file type.");

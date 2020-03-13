@@ -1,7 +1,7 @@
 /**
  * Code created by Rohit Bhatia for self use or Demo purpose only.
  */
-package demo.data;
+package data;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;

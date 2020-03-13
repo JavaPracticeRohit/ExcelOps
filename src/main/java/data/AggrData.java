@@ -1,4 +1,4 @@
-package demo.data;
+package data;
 
 public class AggrData {
 

@@ -1,7 +1,7 @@
 /**
  * Code created by Rohit Bhatia for self use or Demo purpose only.
  */
-package demo.xlsUtils;
+package xlsUtils;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -19,7 +19,7 @@ import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 
-import demo.data.RowData;
+import data.RowData;
 
 /**
  * @author blchi
