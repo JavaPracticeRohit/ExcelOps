@@ -15,10 +15,6 @@ import org.apache.poi.ss.usermodel.CellType;
 
 import data.RowData;
 
-/**
- * @author blchi
- *
- */
 public class XlsWriterUtils {
 
 	public HSSFWorkbook writeHeadersToXls(HSSFWorkbook wb, String sheetName, Map<Integer, String> dataMap, int rowNum)

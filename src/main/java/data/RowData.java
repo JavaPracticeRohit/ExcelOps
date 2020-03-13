@@ -8,18 +8,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-/**
- * @author blchi
- *
- */
 public class RowData {
 	String txCode = "";
 	BigDecimal bgSumTxCount = new BigDecimal(0);
 	BigDecimal bgSumStepCount = new BigDecimal(0);
 	BigDecimal bgSumGuiTime = new BigDecimal(0);
-	private List<String> roles = new ArrayList<String>();
-	private List<String> users = new ArrayList<String>();
-	private List<String> uniqueUsers = new ArrayList<String>();
+	private List<String> roles = new ArrayList<>();
+	private List<String> users = new ArrayList<>();
+	private List<String> uniqueUsers = new ArrayList<>();
 	public String getTxCode() {
 		return txCode;
 	}

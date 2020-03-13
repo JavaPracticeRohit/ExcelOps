@@ -15,111 +15,97 @@ import java.util.logging.Logger;
 
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 
+import commonUtils.ApplicationConstants;
+import commonUtils.CommonUtilities;
 import data.RowData;
 import service.XlsService;
 
 public class Init {
 	private static final Logger LOGGER = Logger.getLogger(Init.class.getName());
-	private static List<String> alErrors = new ArrayList<String>();
+	private static List<String> alErrors = new ArrayList<>();
 
-	public static void main(String args[]) throws IOException {
+	public static void main(String args[]) {
 
 		Init objInitializer = new Init();
 		objInitializer.initiate();
 	}
 
 	private void initiate() {
-		
+
 		XlsService objXlsService = new XlsService();
-		
+
 		String txFilePath = null;
 		String aggrUserFilePath = null;
-		String agr_1251FilePath = null;
+		String agr1251FilePath = null;
 		String destinationPath = null;
-		Scanner in = new Scanner(System.in);
 		boolean fileCheck = false;
 		boolean exit = false;
-		List<String> allowedTypes = new ArrayList<String>();
-		allowedTypes.add("xls");
-		allowedTypes.add("xlsx");
-		Map<Integer,String> txCodeSheetHeaderMap = new HashMap<Integer, String>();
-		txCodeSheetHeaderMap.put(0, "Transaction code");
-		txCodeSheetHeaderMap.put(1, "Sum of Tx Count");
-		txCodeSheetHeaderMap.put(2, "Sum of Steps Count");
-		txCodeSheetHeaderMap.put(3, "Sum of GUITIME");
-		txCodeSheetHeaderMap.put(4, "Roles");
-		txCodeSheetHeaderMap.put(5, "Users");
+		// Scanner object`
+		Scanner in = new Scanner(System.in);
+		List<String> allowedTypes = CommonUtilities.getAllowedFileTypes();
+		Map<Integer, String> txCodeSheetHeaderMap = CommonUtilities.prepareTxCodeHeaderMap();
 		try {
 			do {
 				sendToConsole("-------------------------------------------------");
-				sendToConsole(
-						"Full path(including file name eg:[c:\\<folderName>\\<folderName>\\test.xls]) for Xls Data file containing the following column as follows : ");
-				sendToConsole("1. ENTRY_ID -> Will be termed as Tx Code");
-				sendToConsole("2. Count");
-				sendToConsole("3. LUW_Count");
-				sendToConsole("4. GUI Time");
+				sendToConsole(CommonUtilities.getDescription("welcometext1"));
+				sendToConsole(CommonUtilities.getDescription("wtEntryId"));
+				sendToConsole(CommonUtilities.getDescription("wtCount"));
+				sendToConsole(CommonUtilities.getDescription("wtLuwCount"));
+				sendToConsole(CommonUtilities.getDescription("wtGuiTime"));
 				txFilePath = in.nextLine();
-				sendToConsole(
-						"Full path(including file name eg:[c:\\<folderName>\\<folderName>\\test.xls]) for Xls Data file containing the AGR_USERS Data : ");
+				sendToConsole(CommonUtilities.getDescription("wtAgrFilePath"));
 				aggrUserFilePath = in.nextLine();
-				sendToConsole(
-						"Full path(including file name eg:[c:\\<folderName>\\<folderName>\\test.xls]) for Xls Data file containing the AGR_1251 Data : ");
-				agr_1251FilePath = in.nextLine();
-				sendToConsole("Destination Folder/Directory Path : ");
+				sendToConsole(CommonUtilities.getDescription("wtAgr1251FilePath"));
+				agr1251FilePath = in.nextLine();
+				sendToConsole(CommonUtilities.getDescription("wtDestination"));
 				destinationPath = in.nextLine();
 				if (txFilePath == null || "".equals(txFilePath.trim())) {
-					sendToConsole("Data File Path : Not provided ");
+					sendToConsole(CommonUtilities.getDescription("errDataFilePath"));
 				}
 				if (destinationPath == null || "".equals(destinationPath.trim())) {
-					sendToConsole("Destination File Path : Not provided ");
+					sendToConsole(CommonUtilities.getDescription("errDestination"));
 				} else {
 					isValidPath(txFilePath);
 					isValidDir(destinationPath);
 					if (alErrors.isEmpty()) {
-						try{
-						String fileType = getExtension(txFilePath);
-						if (allowedTypes.contains(fileType)) {
-							fileCheck = true;
-							switch (fileType) {
-							case "xls":	
-								Map<String, RowData> txCodeDataMap = objXlsService.readAndConsolidateTxCodeData(txFilePath);
-								Map<String, List<String>> aggrUserDataMap = objXlsService.readAndConsolidateAggrUserData(aggrUserFilePath);
-								Map<String, RowData> agr_1251DataMap = objXlsService.readAndConsolidateAggr1251UserData(agr_1251FilePath,aggrUserDataMap,txCodeDataMap);
-								
-								
-								HSSFWorkbook workbook;
-								String excelFileName = System.currentTimeMillis() + "";// name of excel file
-								File file = new File(destinationPath + "/" + excelFileName + ".xls");
-								if (file.exists() == false) {
-									// Create new file if it does not exist
-									workbook = new HSSFWorkbook();
-								} else {
-									try (
-											// Make current input to exist file
-											InputStream is = new FileInputStream(file)) {
-										workbook = new HSSFWorkbook(is);
+						try {
+							String fileType = getExtension(txFilePath);
+							if (allowedTypes.contains(fileType)) {
+								fileCheck = true;
+								switch (fileType) {
+								case ApplicationConstants.XLS:
+									Map<String, RowData> txCodeDataMap = objXlsService.readAndConsolidateTxCodeData(txFilePath);
+									Map<String, List<String>> aggrUserDataMap = objXlsService.readAndConsolidateAggrUserData(aggrUserFilePath);
+									Map<String, RowData> agr1251DataMap = objXlsService.readAndConsolidateAggr1251UserData(agr1251FilePath, aggrUserDataMap,txCodeDataMap);
+									HSSFWorkbook workbook;
+									// name of excel file
+									String excelFileName = System.currentTimeMillis() + "";
+									File file = new File(destinationPath + File.separator + excelFileName + "."+ApplicationConstants.XLS);
+									if (!file.exists()) {
+										// Create new file if it does not exist
+										workbook = new HSSFWorkbook();
+									} else {
+										try (
+												// Make current input to exist file
+												InputStream is = new FileInputStream(file)) {
+											workbook = new HSSFWorkbook(is);
+										}
 									}
+									objXlsService.prepareExcel(txCodeSheetHeaderMap, agr1251DataMap, workbook);
+									FileOutputStream fileOut = new FileOutputStream(file);
+									// write this workbook to an Outputstream.
+									workbook.write(fileOut);
+									fileOut.flush();
+									fileOut.close();
+									Desktop.getDesktop().open(file);
+									break;
+								default:
+									sendToConsole(CommonUtilities.getDescription("errInvalidFileType",fileType));
 								}
-								
-								objXlsService.prepareExcel(destinationPath,txCodeSheetHeaderMap,agr_1251DataMap,workbook);
-								FileOutputStream fileOut = new FileOutputStream(file);
-								// write this workbook to an Outputstream.
-								workbook.write(fileOut);
-								fileOut.flush();
-								fileOut.close();
-								
-								
-								Desktop.getDesktop().open(file);
-								break;
-							default:
-								sendToConsole("Implementation missing for " + fileType
-										+ ". Kindly connect with technical Team.");
+							} else {
+								sendToConsole(CommonUtilities.getDescription("errInvalidFileType"));
 							}
-						} else {
-							sendToConsole("Invalid file type.");
-						}
-						}catch (Exception e) {
-							e.printStackTrace();
+						} catch (Exception e) {
 							alErrors.add(e.getMessage());
 						}
 					} else {
@@ -129,7 +115,7 @@ public class Init {
 			} while (!fileCheck);
 			do {
 				printErr();
-				sendToConsole("Press x to exit...");
+				sendToConsole(CommonUtilities.getDescription("exitText"));
 				String eCheck = in.nextLine();
 				if ("x".equalsIgnoreCase(eCheck))
 					exit = true;
@@ -143,12 +129,11 @@ public class Init {
 		for (String err : alErrors) {
 			sendToConsole(err);
 		}
-		alErrors = new ArrayList<String>();
+		alErrors = new ArrayList<>();
 	}
 
 	private void sendToConsole(String message) {
 		System.out.println(message);
-		// LOGGER.info(message);
 	}
 
 	private boolean isValidPath(String path) {
@@ -157,20 +142,20 @@ public class Init {
 			if (file.isFile()) {
 				return true;
 			} else if (file.isDirectory()) {
-				alErrors.add("Complete Path with File Name is needed  : " + path);
+				alErrors.add(CommonUtilities.getDescription("errCompFilePath") + path);
 				return false;
 			}
 		}
-		alErrors.add("Invalid path : " + path);
+		alErrors.add(CommonUtilities.getDescription("errInvalidPath") + path);
 		return false;
 	}
 
 	private boolean isValidDir(String path) {
 		File file = new File(path);
-		if (file != null && file.isDirectory()) {
+		if (file.isDirectory()) {
 			return true;
 		}
-		alErrors.add("Invalid directory path  : " + path);
+		alErrors.add(CommonUtilities.getDescription("errInvalidDir") + path);
 		return false;
 	}
 
@@ -178,11 +163,11 @@ public class Init {
 		char ch;
 		int len;
 		if (fileName == null || (len = fileName.length()) == 0 || (ch = fileName.charAt(len - 1)) == '/' || ch == '\\'
-				|| //in the case of a directory
-				ch == '.') //in the case of . or ..
+				|| // in the case of a directory
+				ch == '.') // in the case of . or ..
 			return "";
-		int dotInd = fileName.lastIndexOf('.'),
-				sepInd = Math.max(fileName.lastIndexOf('/'), fileName.lastIndexOf('\\'));
+		int dotInd = fileName.lastIndexOf('.');
+		int sepInd = Math.max(fileName.lastIndexOf('/'), fileName.lastIndexOf('\\'));
 		if (dotInd <= sepInd)
 			return "";
 		else
